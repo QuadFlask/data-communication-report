@@ -126,7 +126,7 @@ public class HammingTest {
 	}
 
 	private void checkEvenParity(BitPattern bitPattern, int tab, int parity) {
-		assertThat(EvenParityChecker.calcEvenParity(bitPattern, tab), is(parity));
+		assertThat(HammingCodeGenerator.calcEvenParity(bitPattern, tab), is(parity));
 	}
 
 	@Test

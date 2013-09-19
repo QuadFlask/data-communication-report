@@ -8,6 +8,7 @@ import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class EvenParityGeneratorAndCheckerTest {
@@ -15,14 +16,14 @@ public class EvenParityGeneratorAndCheckerTest {
 	public void evenParityOf00_bit() {
 		Bit[] dataword = toBits(0, 0);
 		Bit[] codeword = EvenParityGenerator.addEvenParity(dataword);
-		compare(dataword, 0, 0, 0);
+		compare(codeword, 0, 0, 0);
 	}
 
 	@Test
 	public void evenParityOf01_bit() {
 		Bit[] dataword = toBits(0, 1);
 		Bit[] codeword = EvenParityGenerator.addEvenParity(dataword);
-		compare(dataword, 0, 1, 1);
+		compare(codeword, 0, 1, 1);
 	}
 
 	@Test
@@ -82,7 +83,8 @@ public class EvenParityGeneratorAndCheckerTest {
 	}
 
 	private void compareBits(Bit bit, int value) {
-		assertThat(bit.value(), is(value));
+		//assertThat(bit.value(), is(value));
+		assertEquals(bit.value(), value);
 	}
 
 }

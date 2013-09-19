@@ -1,6 +1,5 @@
 package flask.codes.checker;
 
-import flask.type.Bit;
 import flask.type.BitPattern;
 
 public class HammingCodeChecker {

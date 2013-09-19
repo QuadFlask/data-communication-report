@@ -20,9 +20,5 @@ public class CRCChecker {
 		boolean syndrome = CRCGenerator.isAllZero(code, 0);
 		return syndrome;
 	}
-}
 
-//for (int i = 0; i < shiftRegisterBits.length; i++) {
-//		if (isAllZero(shiftRegisterBits, crc)) return getTrailingBits(crc, shiftRegisterBits);
-//if (shiftRegisterBits[i].is1()) divideAt(shiftRegisterBits, poly, i);
-//}
+}

@@ -11,7 +11,7 @@ public class EvenParityGenerator {
 		Bit parity = new Bit();
 
 		BitUtil.assignBits(dataword, codeword, dataword.length);
-		if (BitUtil.isEven(BitUtil.countOne(dataword))) parity.complement();
+		if (!BitUtil.isEven(BitUtil.countOne(dataword))) parity.complement();
 
 		codeword[dataword.length] = parity;
 		return codeword;
@@ -21,7 +21,7 @@ public class EvenParityGenerator {
 		BitPattern codeword = BitUtil.copy(dataword, dataword.length());
 		Bit parity = new Bit();
 
-		if (BitUtil.isEven(BitUtil.countOne(dataword))) parity.complement();
+		if (!BitUtil.isEven(BitUtil.countOne(dataword))) parity.complement();
 
 		codeword.append(parity);
 		return codeword;
