@@ -4,7 +4,7 @@ import flask.type.Bit;
 import flask.type.BitPattern;
 
 public class CheckSumGenerator {
-	public static final int checksumSize = 16;
+	public static int checksumSize = 8;
 
 	public static BitPattern generate(BitPattern dataword) {
 		BitPattern checkSum = generateCheckSumBits(dataword);
@@ -16,7 +16,7 @@ public class CheckSumGenerator {
 		return codeword;
 	}
 
-	// per 16bits
+	// per 8bits
 	public static BitPattern generateCheckSumBits(BitPattern dataword) {
 		int sum = 0;
 		int loop = dataword.length() / checksumSize;
@@ -30,15 +30,17 @@ public class CheckSumGenerator {
 
 		BitPattern checksum = new BitPattern();
 		checksum.set(sum, checksumSize);
+		checksum.complement();
+		checksum.set(checksum.toInteger() + 1, checksumSize);
 
-		return checksum;
+		return checksum; // 보수 취해야함!
 	}
 
 	public static int valueOf(BitPattern bitPattern, int from, int length) {
 		int value = 0;
 		length += from;
 		for (int i = from; i < length; i++)
-			value += Math.pow(2, length - i - 1) * bitPattern.get(i).value();
+			value += bitPattern.get(i).value() * Math.pow(2, length - i - 1);
 		return value;
 	}
 

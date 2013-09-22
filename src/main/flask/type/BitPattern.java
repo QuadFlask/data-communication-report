@@ -12,6 +12,19 @@ public class BitPattern {
 		}
 	}
 
+	public BitPattern(String str) {
+		int length;
+		char[] chars = str.toCharArray();
+		for (char c : chars) {
+			String binary = Integer.toBinaryString(c);
+			length = 8 - binary.length();
+			for (int i = 0; i < length; i++)
+				append(new Bit(0));
+			for (int i = 0; i < binary.length(); i++)
+				append(new Bit(Integer.parseInt("" + binary.charAt(i))));
+		}
+	}
+
 	public BitPattern() {
 	}
 
@@ -47,10 +60,9 @@ public class BitPattern {
 	public void set(int decimal, int length) {
 		bits.clear();
 		String binary = Integer.toBinaryString(decimal);
-		length -= binary.length();
-		for (int i = 0; i < length; i++)
+		for (int i = 0; i < length - binary.length(); i++)
 			append(new Bit(0));
-		for (int i = 0; i < binary.length(); i++)
+		for (int i = Math.abs(Math.min(length - binary.length(), 0)); i < binary.length(); i++)
 			append(new Bit(Integer.parseInt("" + binary.charAt(i))));
 	}
 
@@ -91,10 +103,41 @@ public class BitPattern {
 		return str;
 	}
 
+	public String toString16() {
+		String str = "";
+		int sum;
+		for (int k = 0; k < bits.size() / 8; k++) {
+			sum = 0;
+			for (int i = 0; i < 8; i++)
+				sum += bits.get(k * 8 + i).value() * Math.pow(2, 7 - i);
+			str += "" + Integer.toHexString(sum).toUpperCase();
+		}
+		return str;
+	}
+
+	public String toStringASCII() {
+		String str = "";
+		char sum;
+		for (int k = 0; k < bits.size() / 8; k++) {
+			sum = 0;
+			for (int i = 0; i < 8; i++)
+				sum += bits.get(k * 8 + i).value() * Math.pow(2, 7 - i);
+			str += "" + Character.toString(sum);
+		}
+		return str;
+	}
+
 	public Integer toInteger() {
 		String str = "";
 		for (Bit bit : bits)
 			str += bit.value();
 		return Integer.parseInt(str, 2);
+	}
+
+	public Long toLong() {
+		String str = "";
+		for (Bit bit : bits)
+			str += bit.value();
+		return Long.getLong(str, 2);
 	}
 }

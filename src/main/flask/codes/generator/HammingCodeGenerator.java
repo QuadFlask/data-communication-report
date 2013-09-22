@@ -52,7 +52,7 @@ public class HammingCodeGenerator {
 		int headIndex = tab - 1;
 		int index, startIndex;
 
-		for (int x = 1; x < 32; x++) {
+		for (int x = 1; x < bitPattern.length(); x++) {
 			startIndex = headIndex + tab * 2 * (x - 1); // 1+0
 			for (int i = 0; i < tab; i++) {
 				index = startIndex + i;
@@ -86,10 +86,9 @@ public class HammingCodeGenerator {
 		for (int i = errorCodeword.length() - 1; i >= 0; i--) {
 			if (isParityIndex(i)) {
 				Bit parity = errorCodeword.get(i);
-				int calcedParity = calcEvenParity(errorCodeword, i);
+				int calcedParity = calcEvenParity(errorCodeword, i + 1);
 
-				if (parity.value() != calcedParity) parities.append(new Bit(1));
-				else parities.append(new Bit(0));
+				parities.append(new Bit(calcedParity));
 			}
 		}
 

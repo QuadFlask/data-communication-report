@@ -1,6 +1,7 @@
 package flask;
 
 import flask.type.Bit;
+import flask.type.BitPattern;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
@@ -19,5 +20,14 @@ public class BitUtilTest {
 		assertThat(BitUtil.toInteger(new Bit[]{new Bit(1), new Bit(1), new Bit(0)}), is(6));
 		assertThat(BitUtil.toInteger(new Bit[]{new Bit(1), new Bit(1), new Bit(1)}), is(7));
 		assertThat(BitUtil.toInteger(new Bit[]{new Bit(1), new Bit(0), new Bit(0), new Bit(0)}), is(8));
+	}
+
+	@Test
+	public void bitpatternTest() {
+		BitPattern b = new BitPattern("abcdefgABCDEFG");
+
+		System.out.println(b.toString());
+		System.out.println(b.toString16());
+		System.out.println(b.toStringASCII());
 	}
 }
