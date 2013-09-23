@@ -6,6 +6,7 @@ import flask.codes.generator.CRCGenerator;
 import flask.type.Bit;
 import flask.type.BitPattern;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
