@@ -103,6 +103,14 @@ public class BitPattern {
 		return str;
 	}
 
+	@Override
+	public BitPattern clone() {
+		BitPattern cloned = new BitPattern();
+		for (Bit bit : bits)
+			cloned.append(bit.clone());
+		return cloned;
+	}
+
 	public String toString16() {
 		String str = "";
 		int sum;

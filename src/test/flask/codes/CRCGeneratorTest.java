@@ -6,7 +6,6 @@ import flask.codes.generator.CRCGenerator;
 import flask.type.Bit;
 import flask.type.BitPattern;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -34,7 +33,8 @@ public class CRCGeneratorTest {
 	private BitPattern bookSampleCRCCode13;
 	private BitPattern bookSampleCRCCode14;
 	private BitPattern bookSampleCRCCode15;
-	private Bit[] polynomial = new Bit[]{new Bit(1), new Bit(0), new Bit(1), new Bit(1)};
+
+	private BitPattern polynomial = new BitPattern(1, 0, 1, 1);
 	private int crcLength = 3;
 
 	@Before
@@ -104,27 +104,57 @@ public class CRCGeneratorTest {
 	}
 
 	private void check(BitPattern dataword, String booksCode) {
-		assertThat(CRCGenerator.generate(dataword, polynomial, crcLength).toString(), is(booksCode));
+		System.out.print("Checking crc (dataword: " + dataword.toString() + ")");
+		BitPattern generatedCodeword = CRCGenerator.generate(dataword, polynomial, crcLength);
+		assertThat(generatedCodeword.toString(), is(booksCode));
+		System.out.println(" generated codeword: '" + generatedCodeword.toString() + "' is match with '" + booksCode + "'");
 	}
 
 	@Test
 	public void checkCRC() {
-		assertThat(CRCChecker.check(bookSampleCRCCode0, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode1, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode2, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode3, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode4, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode5, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode6, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode7, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode8, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode9, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode10, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode11, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode12, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode13, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode14, polynomial, crcLength), is(true));
-		assertThat(CRCChecker.check(bookSampleCRCCode15, polynomial, crcLength), is(true));
+		CRCCheckerTest(bookSampleCRCCode0, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode1, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode2, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode3, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode4, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode5, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode6, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode7, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode8, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode9, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode10, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode11, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode12, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode13, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode14, polynomial, crcLength);
+		CRCCheckerTest(bookSampleCRCCode15, polynomial, crcLength);
+	}
+
+
+	private void CRCCheckerTest(BitPattern bookSampleCRCCode, BitPattern polynomial, int crcLength) {
+		System.out.print("Checking CRC: '" + bookSampleCRCCode.toString() + "' with polynomial: '" + polynomial.toString() + "' and CRC's size = " + crcLength);
+		assertThat(CRCChecker.check(bookSampleCRCCode, polynomial, crcLength), is(true));
+		System.out.println(" -> No error!");
+	}
+
+	@Test
+	public void errorTest() {
+		BitPattern errorSampleCRCCode5 = bookSampleCRCCode5.clone();
+		BitPattern errorSampleCRCCode6 = bookSampleCRCCode6.clone();
+		BitPattern errorSampleCRCCode7 = bookSampleCRCCode7.clone();
+		BitPattern errorSampleCRCCode8 = bookSampleCRCCode8.clone();
+		BitPattern errorSampleCRCCode9 = bookSampleCRCCode9.clone();
+		errorSampleCRCCode5.get(0).complement(); // make error at 0;
+		errorSampleCRCCode6.get(1).complement(); // make error at 1;
+		errorSampleCRCCode7.get(3).complement(); // make error at 3;
+		errorSampleCRCCode8.get(2).complement(); // make error at 2;
+		errorSampleCRCCode9.get(5).complement(); // make error at 5;
+		assertThat(CRCChecker.check(errorSampleCRCCode5, polynomial, crcLength), is(false)); // is error?
+		assertThat(CRCChecker.check(errorSampleCRCCode6, polynomial, crcLength), is(false)); // is error?
+		assertThat(CRCChecker.check(errorSampleCRCCode7, polynomial, crcLength), is(false)); // is error?
+		assertThat(CRCChecker.check(errorSampleCRCCode8, polynomial, crcLength), is(false)); // is error?
+		assertThat(CRCChecker.check(errorSampleCRCCode9, polynomial, crcLength), is(false)); // is error?
+		System.out.println("errorTest: passed");
 	}
 
 	@Test

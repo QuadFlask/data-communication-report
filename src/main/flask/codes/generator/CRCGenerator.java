@@ -5,7 +5,7 @@ import flask.type.BitPattern;
 
 public class CRCGenerator {
 
-	public static BitPattern generate(BitPattern dataword, Bit[] polynomial, int crcLength){
+	public static BitPattern generate(BitPattern dataword, BitPattern polynomial, int crcLength) {
 		BitPattern codeword = new BitPattern();
 		Bit[] crcBits = crc(dataword, polynomial, crcLength);
 
@@ -17,7 +17,7 @@ public class CRCGenerator {
 		return codeword;
 	}
 
-	public static Bit[] crc(BitPattern dataword, Bit[] polynomial, int crcLength) {
+	public static Bit[] crc(BitPattern dataword, BitPattern polynomial, int crcLength) {
 		BitPattern shiftRegister = new BitPattern();
 		shiftRegister.setLength(dataword.length() + crcLength);
 		Bit[] shiftRegisterBits = shiftRegister.values();
@@ -33,9 +33,9 @@ public class CRCGenerator {
 		return null;
 	}
 
-	public static void divideAt(Bit[] shiftRegister, Bit[] polynomial, int i) {
-		for (int k = 0; k < polynomial.length; k++)
-			shiftRegister[i + k].set(shiftRegister[i + k].value() ^ polynomial[k].value());
+	public static void divideAt(Bit[] shiftRegister, BitPattern polynomial, int i) {
+		for (int k = 0; k < polynomial.length(); k++)
+			shiftRegister[i + k].set(shiftRegister[i + k].value() ^ polynomial.get(k).value());
 	}
 
 	public static Bit[] getTrailingBits(int crc, Bit[] shiftRegister) {

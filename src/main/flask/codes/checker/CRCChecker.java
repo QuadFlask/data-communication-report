@@ -6,7 +6,7 @@ import flask.type.BitPattern;
 
 public class CRCChecker {
 
-	public static boolean check(BitPattern codeword, Bit[] polynomial, int crcLength) {
+	public static boolean check(BitPattern codeword, BitPattern polynomial, int crcLength) {
 		Bit[] code = codeword.values();
 
 		for (int i = 0; i < code.length - crcLength; i++)

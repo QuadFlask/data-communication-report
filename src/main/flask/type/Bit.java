@@ -47,8 +47,8 @@ public class Bit {
 	}
 
 	@Override
-	public Object clone() {
-		Bit c = (Bit) new Object();
+	public Bit clone() {
+		Bit c = new Bit();
 		c.set(value);
 		return c;
 	}
