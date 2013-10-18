@@ -3,22 +3,27 @@ package flask.codes.generator;
 import flask.type.Bit;
 import flask.type.BitPattern;
 
-public class CheckSumGenerator {
-	public static int checksumSize = 8;
+public class CheckSumGenerator implements Generator {
+	private int checksumSize;
 
-	public static BitPattern generate(BitPattern dataword) {
+	public CheckSumGenerator(int checksumSize) {
+		this.checksumSize = checksumSize;
+	}
+
+	public BitPattern generate(BitPattern dataword) {
 		BitPattern checkSum = generateCheckSumBits(dataword);
 		BitPattern codeword = new BitPattern();
+
 		for (int i = 0; i < dataword.length(); i++)
 			codeword.append(new Bit(dataword.get(i).value()));
 		for (int i = 0; i < checkSum.length(); i++)
 			codeword.append(new Bit(checkSum.get(i).value()));
+
 		return codeword;
 	}
 
-	// per 8bits
-	public static BitPattern generateCheckSumBits(BitPattern dataword) {
-		int sum = 0;
+	public BitPattern generateCheckSumBits(BitPattern dataword) {
+		long sum = 0;
 		int loop = dataword.length() / checksumSize;
 		int remain = dataword.length() % checksumSize;
 
@@ -26,14 +31,26 @@ public class CheckSumGenerator {
 			sum += valueOf(dataword, remain + i * checksumSize, checksumSize);
 		sum += valueOf(dataword, 0, remain);
 
-		sum %= (int) Math.pow(2, checksumSize);
+		sum = wrap(sum, checksumSize);
 
 		BitPattern checksum = new BitPattern();
 		checksum.set(sum, checksumSize);
 		checksum.complement();
-		checksum.set(checksum.toInteger() + 1, checksumSize);
 
-		return checksum; // 보수 취해야함!
+		return checksum;
+	}
+
+	public static long wrap(long sum, int wrapSize) {
+		long wrapedSum = 0;
+		long pow = (int) Math.pow(2, wrapSize) - 1;
+
+		while (sum > 0) {
+			long wraped = sum & pow;
+			wrapedSum += wraped;
+			sum >>= wrapSize;
+		}
+
+		return (wrapedSum > pow) ? wrap(wrapedSum, wrapSize) : wrapedSum;
 	}
 
 	public static int valueOf(BitPattern bitPattern, int from, int length) {

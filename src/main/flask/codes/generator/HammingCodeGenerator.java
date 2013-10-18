@@ -1,59 +1,60 @@
 package flask.codes.generator;
 
 import flask.BitUtil;
-import flask.codes.checker.EvenParityChecker;
-import flask.codes.checker.HammingCodeChecker;
 import flask.type.Bit;
 import flask.type.BitPattern;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HammingCodeGenerator {
+public class HammingCodeGenerator implements Generator {
 
-	// dataword size : k
-	// codeword size : n
-	// parity size : n-k
-	public static Map<BitPattern, BitPattern> generate(int datawordSize) {
+	@Override
+	public BitPattern generate(BitPattern dataword) {
+		int codewordSize = calcCodewordSize(dataword.length());
+		BitPattern codeword = makeEmptyCodeword(dataword, codewordSize);
+
+		for (int i = 1; i < codewordSize; i *= 2)
+			insertParity(codeword, i);
+
+		return codeword;
+	}
+
+	public Map<BitPattern, BitPattern> generateAsSequence(int datawordSize) {
 		Map<BitPattern, BitPattern> codes = new HashMap<BitPattern, BitPattern>();
-		List<BitPattern> keyset = BitPatternSequenceGenerator.generate(datawordSize);
-		int codewordSize = getCodewordSize(datawordSize);
+		List<BitPattern> datawordSet = BitPatternSequenceGenerator.generate(datawordSize);
 
-		for (BitPattern key : keyset) {
-			BitPattern value = makeEmptyCodeword(key, codewordSize);
-			for (int i = 1; i < codewordSize; i *= 2)
-				insertParity(value, i);
-			codes.put(key, value);
-		}
+		for (BitPattern dataword : datawordSet)
+			codes.put(dataword, generate(dataword));
 
 		return codes;
 	}
 
-	public static BitPattern makeEmptyCodeword(BitPattern dataword, int size) {
+	public BitPattern makeEmptyCodeword(BitPattern dataword, int size) {
 		BitPattern code = new BitPattern();
 		int index = 0;
+
 		for (int i = 0; i < size; i++) {
 			Bit bit = new Bit();
 			if (!isParityIndex(i))
 				bit.set(dataword.get(index++).value());
 			code.append(bit);
 		}
+
 		return code;
 	}
 
-	public static void insertParity(BitPattern codeword, int parityIndex) {
+	public void insertParity(BitPattern codeword, int parityIndex) {
 		codeword.get(parityIndex - 1).set(calcEvenParity(codeword, parityIndex));
 	}
 
 	public static int calcEvenParity(BitPattern bitPattern, int tab) {
-		int count = 0;
+		int count = 0, index, startIndex;
 		int headIndex = tab - 1;
-		int index, startIndex;
 
 		for (int x = 1; x < bitPattern.length(); x++) {
-			startIndex = headIndex + tab * 2 * (x - 1); // 1+0
+			startIndex = headIndex + tab * 2 * (x - 1);
 			for (int i = 0; i < tab; i++) {
 				index = startIndex + i;
 				if (index < bitPattern.length())
@@ -64,39 +65,16 @@ public class HammingCodeGenerator {
 		return count % 2;
 	}
 
-
 	public static boolean isParityIndex(int index) {
 		index++;
 		return index == Math.pow(2, (int) BitUtil.log2(index));
 	}
 
-	public static int getCodewordSize(int datawordSize) {
-		int sum = 0;
-		int i = 1;
+	public static int calcCodewordSize(int datawordSize) {
+		int sum = 0, i = 1;
 		do {
 			sum += Math.pow(2, i++) - 1;
 		} while (datawordSize > sum);
 		return datawordSize + i;
 	}
-
-	public static BitPattern correction(BitPattern errorCodeword) {
-		if (HammingCodeChecker.check(errorCodeword)) return errorCodeword; // valid codeword
-
-		BitPattern parities = new BitPattern();
-		for (int i = errorCodeword.length() - 1; i >= 0; i--) {
-			if (isParityIndex(i)) {
-				Bit parity = errorCodeword.get(i);
-				int calcedParity = calcEvenParity(errorCodeword, i + 1);
-
-				parities.append(new Bit(calcedParity));
-			}
-		}
-
-		int errorBitLocation = parities.toInteger() - 1;
-		errorCodeword.get(errorBitLocation).complement();
-
-		return errorCodeword;
-	}
-
-
 }

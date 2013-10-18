@@ -55,6 +55,13 @@ public class BitUtil {
 		return Math.log(x) / Math.log(2);
 	}
 
+	public static boolean isAllZero(Bit[] shiftRegister, int crc) {
+		boolean has1 = false;
+		for (int j = 0; j < shiftRegister.length - crc; j++)
+			has1 |= shiftRegister[j].is1();
+		return !has1;
+	}
+
 	public static boolean verifyLinear(Map<BitPattern, BitPattern> sampleCode) {
 		for (BitPattern b1 : sampleCode.values())
 			for (BitPattern b2 : sampleCode.values()) {

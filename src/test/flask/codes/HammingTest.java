@@ -1,8 +1,8 @@
 package flask.codes;
 
 import flask.BitUtil;
-import flask.codes.checker.EvenParityChecker;
 import flask.codes.checker.HammingCodeChecker;
+import flask.codes.checker.HammingCodeCorrector;
 import flask.codes.generator.BitPatternSequenceGenerator;
 import flask.codes.generator.HammingCodeGenerator;
 import flask.type.BitPattern;
@@ -20,6 +20,10 @@ import static org.junit.Assert.assertThat;
 public class HammingTest {
 	Map<BitPattern, BitPattern> sampleCode;
 
+	HammingCodeGenerator generator;
+	HammingCodeChecker checker;
+	HammingCodeCorrector corrector;
+
 	@Before
 	public void setUp() {
 		sampleCode = new HashMap<BitPattern, BitPattern>();
@@ -27,6 +31,9 @@ public class HammingTest {
 		sampleCode.put(new BitPattern(0, 1), new BitPattern(0, 1, 0, 1, 1));
 		sampleCode.put(new BitPattern(1, 0), new BitPattern(1, 0, 1, 0, 1));
 		sampleCode.put(new BitPattern(1, 1), new BitPattern(1, 1, 1, 1, 0));
+
+		generator = new HammingCodeGenerator();
+		checker = new HammingCodeChecker();
 	}
 
 	@Test
@@ -63,7 +70,7 @@ public class HammingTest {
 	}
 
 	private void checkCodewordSize(int datawordSize, int codewordSize) {
-		assertThat(HammingCodeGenerator.getCodewordSize(datawordSize), is(codewordSize));
+		assertThat(HammingCodeGenerator.calcCodewordSize(datawordSize), is(codewordSize));
 	}
 
 	@Test
@@ -129,19 +136,6 @@ public class HammingTest {
 		assertThat(HammingCodeGenerator.calcEvenParity(bitPattern, tab), is(parity));
 	}
 
-	@Test
-	public void checkExtendsCodeword_containsOnlyDataword() {
-		List<BitPattern> dataword = BitPatternSequenceGenerator.generate(2);
-		BitPattern bits = HammingCodeGenerator.makeEmptyCodeword(dataword.get(0), 5);
-		checkBits(bits, 0, 0, 0, 0, 0);
-		bits = HammingCodeGenerator.makeEmptyCodeword(dataword.get(1), 5);
-		checkBits(bits, 0, 0, 0, 0, 1);
-		bits = HammingCodeGenerator.makeEmptyCodeword(dataword.get(2), 5);
-		checkBits(bits, 0, 0, 1, 0, 0);
-		bits = HammingCodeGenerator.makeEmptyCodeword(dataword.get(3), 5);
-		checkBits(bits, 0, 0, 1, 0, 1);
-	}
-
 	private void checkBits(BitPattern bits, int... values) {
 		for (int i = 0; i < bits.length(); i++)
 			assertThat(bits.get(i).value(), is(values[i]));
@@ -149,7 +143,7 @@ public class HammingTest {
 
 	@Test
 	public void generateOfDatawordSizeIs1() {
-		Map<BitPattern, BitPattern> result = HammingCodeGenerator.generate(1);
+		Map<BitPattern, BitPattern> result = generator.generateAsSequence(1);
 		for (BitPattern b : result.values())
 			verifyHammingCode(b);
 		assertThat(BitUtil.verifyLinear(result), is(true));
@@ -158,7 +152,7 @@ public class HammingTest {
 
 	@Test
 	public void generateOfDatawordSizeIs2() {
-		Map<BitPattern, BitPattern> result = HammingCodeGenerator.generate(2);
+		Map<BitPattern, BitPattern> result = generator.generateAsSequence(2);
 		for (BitPattern b : result.values())
 			verifyHammingCode(b);
 		assertThat(BitUtil.verifyLinear(result), is(true));
@@ -167,7 +161,7 @@ public class HammingTest {
 
 	@Test
 	public void generateOfDatawordSizeIs3() {
-		Map<BitPattern, BitPattern> result = HammingCodeGenerator.generate(3);
+		Map<BitPattern, BitPattern> result = generator.generateAsSequence(3);
 		for (BitPattern b : result.values())
 			verifyHammingCode(b);
 		assertThat(BitUtil.verifyLinear(result), is(true));
@@ -176,7 +170,7 @@ public class HammingTest {
 
 	@Test
 	public void generateOfDatawordSizeIs4() {
-		Map<BitPattern, BitPattern> result = HammingCodeGenerator.generate(4);
+		Map<BitPattern, BitPattern> result = generator.generateAsSequence(4);
 		for (BitPattern b : result.values())
 			verifyHammingCode(b);
 		assertThat(BitUtil.verifyLinear(result), is(true));
@@ -184,10 +178,9 @@ public class HammingTest {
 	}
 
 	private void printCodewords(Map<BitPattern, BitPattern> result) {
-		return;
-//		for (BitPattern b : result.keySet())
-//			System.out.println(b.toString() + " -> " + result.get(b).toString());
-//		System.out.println("dmin : " + BitUtil.minimumHammingDistance(result.values()));
+		for (BitPattern b : result.keySet())
+			System.out.println(b.toString() + " -> " + result.get(b).toString());
+		System.out.println("dmin : " + BitUtil.minimumHammingDistance(result.values()));
 	}
 
 	@Test
@@ -203,7 +196,7 @@ public class HammingTest {
 	}
 
 	private void verifyHammingCode(BitPattern codeword) {
-		assertThat(HammingCodeChecker.check(codeword), is(true));
+		assertThat(checker.check(codeword), is(true));
 	}
 
 }

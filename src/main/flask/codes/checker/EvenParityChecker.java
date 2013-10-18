@@ -4,19 +4,9 @@ import flask.BitUtil;
 import flask.type.Bit;
 import flask.type.BitPattern;
 
-public class EvenParityChecker {
-
-	public static boolean check(Bit[] bits) {
-		return BitUtil.isEven(BitUtil.countOne(bits));
+public class EvenParityChecker implements Checker {
+	@Override
+	public boolean check(BitPattern codeword) {
+		return BitUtil.isEven(BitUtil.countOne(codeword.values()));
 	}
-
-	public static Bit[] extract(Bit[] codeword) {
-		if (!check(codeword)) return null;
-
-		Bit[] dataword = new Bit[codeword.length - 1];
-		BitUtil.assignBits(codeword, dataword, dataword.length);
-
-		return dataword;
-	}
-
 }

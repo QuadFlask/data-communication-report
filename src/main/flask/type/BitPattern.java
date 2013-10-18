@@ -57,9 +57,9 @@ public class BitPattern {
 		return bits.get(index);
 	}
 
-	public void set(int decimal, int length) {
+	public void set(long decimal, int length) {
 		bits.clear();
-		String binary = Integer.toBinaryString(decimal);
+		String binary = Long.toBinaryString(decimal);
 		for (int i = 0; i < length - binary.length(); i++)
 			append(new Bit(0));
 		for (int i = Math.abs(Math.min(length - binary.length(), 0)); i < binary.length(); i++)

@@ -1,13 +1,22 @@
 package flask.codes.generator;
 
+import flask.BitUtil;
 import flask.type.Bit;
 import flask.type.BitPattern;
 
-public class CRCGenerator {
+public class CRCGenerator implements Generator {
+	private BitPattern polynomial;
+	private int crcLength;
 
-	public static BitPattern generate(BitPattern dataword, BitPattern polynomial, int crcLength) {
+	public CRCGenerator(BitPattern polynomial, int crcLength) {
+		this.polynomial = polynomial;
+		this.crcLength = crcLength;
+	}
+
+	@Override
+	public BitPattern generate(BitPattern dataword) {
 		BitPattern codeword = new BitPattern();
-		Bit[] crcBits = crc(dataword, polynomial, crcLength);
+		Bit[] crcBits = getCRC(dataword);
 
 		for (int i = 0; i < dataword.length(); i++)
 			codeword.append(dataword.get(i));
@@ -17,7 +26,7 @@ public class CRCGenerator {
 		return codeword;
 	}
 
-	public static Bit[] crc(BitPattern dataword, BitPattern polynomial, int crcLength) {
+	private Bit[] getCRC(BitPattern dataword) {
 		BitPattern shiftRegister = new BitPattern();
 		shiftRegister.setLength(dataword.length() + crcLength);
 		Bit[] shiftRegisterBits = shiftRegister.values();
@@ -26,19 +35,14 @@ public class CRCGenerator {
 			shiftRegisterBits[i].set(dataword.get(i).value());
 
 		for (int i = 0; i < shiftRegisterBits.length; i++) {
-			if (isAllZero(shiftRegisterBits, crcLength)) return getTrailingBits(crcLength, shiftRegisterBits);
+			if (BitUtil.isAllZero(shiftRegisterBits, crcLength)) return getTrailingBits(crcLength, shiftRegisterBits);
 			if (shiftRegisterBits[i].is1()) divideAt(shiftRegisterBits, polynomial, i);
 		}
 
 		return null;
 	}
 
-	public static void divideAt(Bit[] shiftRegister, BitPattern polynomial, int i) {
-		for (int k = 0; k < polynomial.length(); k++)
-			shiftRegister[i + k].set(shiftRegister[i + k].value() ^ polynomial.get(k).value());
-	}
-
-	public static Bit[] getTrailingBits(int crc, Bit[] shiftRegister) {
+	private Bit[] getTrailingBits(int crc, Bit[] shiftRegister) {
 		Bit[] remainder = new Bit[crc];
 		for (int j = 0; j < crc; j++) {
 			remainder[j] = new Bit();
@@ -47,11 +51,8 @@ public class CRCGenerator {
 		return remainder;
 	}
 
-	public static boolean isAllZero(Bit[] shiftRegister, int crc) {
-		boolean has1 = false;
-		for (int j = 0; j < shiftRegister.length - crc; j++)
-			has1 |= shiftRegister[j].is1();
-		return !has1;
+	public static void divideAt(Bit[] shiftRegister, BitPattern polynomial, int i) {
+		for (int k = 0; k < polynomial.length(); k++)
+			shiftRegister[i + k].set(shiftRegister[i + k].value() ^ polynomial.get(k).value());
 	}
-
 }
